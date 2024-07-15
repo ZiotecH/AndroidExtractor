@@ -170,7 +170,7 @@ function DownloadApplication{
     }
     switch($Application){
         0 {
-            $File = (Download-File -Source $depURLs.zip -quiet)
+            $File = (Download-File -Source $depURLs.zip -silent)
             $Result.File = $File
             if($File.Success){
                 $InstallResult = (Start-Process msiexec -ArgumentList ("-a","$($File.Result)","-l","7zip-x64.log","TARGETDIR=`"$($autoVars.depFolder)\7zip`"","-passive"));
@@ -187,7 +187,7 @@ function DownloadApplication{
             Break;
         }
         1 {
-            $File = (Download-File -Source $depURLs.adb -quiet)
+            $File = (Download-File -Source $depURLs.adb -silent)
             $Result.File = $File
             if(!$DependencyStatus["7zip"]){Return $Result}
             if($File.Success){
