@@ -1,3 +1,85 @@
+class myMath {
+    [decimal] Pow ($a, $b) {
+        return [math]::pow($a, $b)
+    }
+
+    [decimal] Sqrt ($a) {
+        return [math]::sqrt($a)
+    }
+
+    [decimal] Round ($a, $b = 2) {
+        return [math]::round($a, $b)
+    }
+
+    [int64] Ceil ($a) {
+        return [math]::ceiling($a)
+    }
+
+    [int64] Floor ($a) {
+        return [math]::floor($a)
+    }
+
+    [decimal] Log ($a, $b = 10) {
+        return [math]::log($a, $b)
+    }
+
+    [decimal] Log10 ($a) {
+        return [math]::log($a, 10)
+    }
+
+    [decimal] Min ($a, $b) {
+        return [math]::min($a, $b)
+    }
+
+    [decimal] Max ($a, $b) {
+        return [math]::max($a, $b)
+    }
+
+    [decimal] Clamp ($val, $min, $max) {
+        $val = [math]::max($val, $min)
+        $val = [math]::min($val, $max)
+        return $val 
+    }
+
+    [bool] Positive ($a) {
+        return ($a -gt 0)
+    }
+
+    [bool] Negative ($a) {
+        return ($a -lt 0)
+    }
+
+    [bool] Zero ($a) {
+        return ($a -eq 0)
+    }
+
+    [bool] NearZero ($a) {
+        return ([int16]$a -eq 0)
+    }
+
+    [bool] Odd ($a) {
+        return ([bool]($a % 2))
+    }
+
+    [bool] Even ($a) {
+        return (![bool]($a % 2))
+    }
+
+    [bool] Between ($val, $min, $max) {
+        return ($val -ge $min -or $val -le $max)
+    }
+
+    [string] Parity ($a) {
+        return ("Even", "Odd")[$a % 2]
+    }
+
+    #math base conversions
+    [uint32] ConvertFromHex ([string]$hex) {
+        $hex = $hex.split("x")[-1]
+        return [uint32]"0x$hex"
+    }
+}
+
 class timeTable {
     [uint32]$Year
     [uint16]$Month
