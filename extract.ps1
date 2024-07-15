@@ -274,6 +274,12 @@ if(!(Get-Variable "myMods" -ErrorAction SilentlyContinue)){
                 }
                 . $myMods\Classes.ps1
             }
+            if (!$DependencyStatus["New-ArrayList"]) {
+                if(!(Test-Path $myMods\New-ArrayList.ps1)){
+                    Invoke-WebRequest $depURLs.nal -OutFile "$($autoVars.depFolder)\New-ArrayList.ps1" -ErrorAction Stop
+                }
+                . $myMods\New-ArrayList.ps1
+            }
             if(!$DependencyStatus["withFlag"] -or !(tfp "withFlag" "list")){
                 if (!(Test-Path $myMods\withFlag.ps1)) {
                     Invoke-WebRequest $depURLs.wif -OutFile "$($autoVars.depFolder)\withFlag.ps1" -ErrorAction Stop
