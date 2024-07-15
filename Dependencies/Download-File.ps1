@@ -30,12 +30,16 @@ function global:Download-File {
         [bool]$noDest = $false
 
         #Check keys
+        if (!$FlagStatus.DownloadInfo) {$DownloadInfo = [DownloadInfo]::New()}
         if (!$FlagStatus.name) { $noName = $true }
         if (!$FlagStatus.extension) { $noExt = $true }
         if (!$FlagStatus.destination) { $noDest = $true }
         if (!$FlagStatus.source){
             if(!$FlagStatus.DownloadInfo){
-                return [DownloadInfo]::New($false,$null,$PSCmdlet.MyInvocation.BoundParameters.Keys,$null,$null,([Exception]::New("No download source was defined."),"No download source was defined."))
+                $DownloadInfo.Flags = $myFlags
+                $DownloadInfo.Exception = [Exception]::New("No download source was defined.")
+                $DownloadInfo.Message = "No download source was defined."
+                return $DownloadInfo
             }
             else{
                 $Source = $DownloadInfo.Source
@@ -80,26 +84,18 @@ function global:Download-File {
                     Write-Host "$errMsg" -ForegroundColor Red
                     Write-Host "Is '$source' available?" -ForegroundColor DarkYellow
                 }
-                if($FlagStatus.DownloadInfo){
-                    $DownloadInfo.Success = $false
-                    $DownloadInfo.Flags = $myFlags
-                    $DownloadInfo.Exception = $_
-                    $DownloadInfo.Message = $errMsg
-                }else{
-                    $DownloadInfo = [DownloadInfo]::New($false,$source,$myFlags,$name,$extension,$destination,$_,$_.Exception.Message,$null,$null)
-                }
-                return $DownloadInfo
-            }
-        }
-        catch{
-            if($FlagStatus.DownloadInfo){
                 $DownloadInfo.Success = $false
                 $DownloadInfo.Flags = $myFlags
                 $DownloadInfo.Exception = $_
                 $DownloadInfo.Message = $errMsg
-            }else{
-                $DownloadInfo = [DownloadInfo]::New($false,$source,$myFlags,$name,$extension,$destination,$_,$_.Exception.Message,$null,$null)
+                return $DownloadInfo
             }
+        }
+        catch{
+            $DownloadInfo.Success = $false
+            $DownloadInfo.Flags = $myFlags
+            $DownloadInfo.Exception = $_
+            $DownloadInfo.Message = $errMsg
             Return $DownloadInfo
         }
         $rawLen = $response.get_ContentLength()
@@ -166,27 +162,15 @@ function global:Download-File {
                     Write-Host "$(Write-ProgressBar -msgPayload " File located at: '$(Get-Item $combined_name)' " -progress 1 -width $winWidth)"
                     Write-Host "$(Write-ProgressBar -msgPayload " Download took $(hmsCalc $TotalSeconds 0)" -progress 1 -width $winWidth)"
                 }
-                if($FlagStatus.DownloadInfo){
-                    #Update DownloadInfo object that was passed to function
-                    $DownloadInfo.Success = $True
-                    $DownloadInfo.Flags = $myFlags
-                    $DownloadInfo.Result = (Get-Item $combined_name)
-                    $DownloadInfo.Seconds = $TotalSeconds
-                }else{
-                    #Create new DownloadInfo object
-                    $DownloadInfo = [DownloadInfo]::New(
-                        $True,
-                        $Source,
-                        $myFlags,
-                        $Name,
-                        $Extension,
-                        $Destination,
-                        $null,
-                        "Successfully downloaded file '$($OriginalName)'.",
-                        (Get-Item $combined_name),
-                        $TotalSeconds
-                    )
-                }
+                $DownloadInfo.Success = $True
+                $DownloadInfo.Source = $Source
+                $DownloadInfo.Flags = $myFlags
+                $DownloadInfo.Name = $Name
+                $DownloadInfo.Extension = $Extension
+                $DownloadInfo.Destination = $Destination
+                $DownloadInfo.Result = (Get-Item $combined_name)
+                $DownloadInfo.Message = "Successfully downloaded file '$($OriginalName)'."
+                $DownloadInfo.Seconds = $TotalSeconds
             }
             catch {
                 throw
@@ -201,14 +185,10 @@ function global:Download-File {
             }
         }
         catch {
-            if($FlagStatus.DownloadInfo){
-                $DownloadInfo.Success = $false
-                $DownloadInfo.Flags = $myFlags
-                $DownloadInfo.Exception = $_
-                $DownloadInfo.Message = "Generic error, check attached exception."
-            }else{
-                $DownloadInfo = [DownloadInfo]::New($false,$Source,$myFlags,$Name,$Extension,$Destination,$_,$_.Exception.Message,$null,$null)
-            }
+            $DownloadInfo.Success = $false
+            $DownloadInfo.Flags = $myFlags
+            $DownloadInfo.Exception = $_
+            $DownloadInfo.Message = "Generic error, check attached exception."
         }
         finally {
             $responseStream.Dispose()
