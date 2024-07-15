@@ -33,7 +33,7 @@ class FlagInfo {
     }
 }
 
-$Dependencies = ("Classes.ps1","New-ArrayList.ps1", "isNull.ps1", "Write-ProgressBar.ps1", "Get-Time.ps1", "Download-File.ps1", "withFlag.ps1", "hmsCalc.ps1");
+$Dependencies = ("Classes.ps1","New-ArrayList.ps1", "isNull.ps1", "Write-ProgressBar.ps1", "Get-Time.ps1", "Download-File.ps1", "withFlag.ps1", "hmsCalc.ps1","DisplayInBytes.ps1");
 $Applications = @{ "adb" = "https://developer.android.com/tools/releases/platform-tools#downloads"; "7zip" = "https://www.7-zip.org/download.html" }
 $HalfWidth = [Math]::Floor(($Host.UI.RawUI.WindowSize.Width-1)/2);
 $dlURL = "https://raw.githubusercontent.com/ZiotecH/AndroidExtractor/dev/Dependencies";
@@ -47,6 +47,7 @@ $depURLs = [PSCustomObject]@{
     wpb = "$dlURL/Write-ProgressBar.ps1"
     get = "$dlURL/Get-Time.ps1"
     hms = "$dlURL/hmscalc.ps1"
+    dib = "$dlURL/DisplayInBytes.ps1"
     zip = "https://api.github.com/repos/ip7z/7zip/releases/latest"
 }
 $autoVars = [PSCustomObject]@{
@@ -62,6 +63,7 @@ $DependencyStatus = @{
     "New-Arraylist" = $null
     "isNull" = $null
     "Write-ProgressBar" = $null
+    "DisplayInBytes" = $null
     "Get-Time" = $null
     "adb" = $null
     "hms" = $null
@@ -170,6 +172,7 @@ function DownloadApplication{
     }
     switch($Application){
         0 {
+            $depURLs.zip = pghl $depURLs.zip
             $File = (Download-File -Source $depURLs.zip -silent)
             $Result.File = $File
             if($File.Success){
@@ -285,6 +288,12 @@ if(!(Get-Variable "myMods" -ErrorAction SilentlyContinue)){
                     Invoke-WebRequest $depURLs.wif -OutFile "$($autoVars.depFolder)\withFlag.ps1" -ErrorAction Stop
                 }
                 . $myMods\withFlag.ps1
+            }
+            if (!$DependencyStatus["DisplayInBytes"]) {
+                if(!(Test-Path $myMods\DisplayInBytes.ps1)){
+                    Invoke-WebRequest $depURLs.nal -OutFile "$($autoVars.depFolder)\DisplayInBytes.ps1" -ErrorAction Stop
+                }
+                . $myMods\DisplayInBytes.ps1
             }
             if (!$DependencyStatus["Download-File"] -or !(tfp "Download-File" "DownloadInfo")) {
                 if (!(Test-Path $myMods\Download-File.ps1)) {
