@@ -238,25 +238,149 @@ class DownloadInfo {
     [System.IO.FileInfo]$Result
     [UInt64]$Seconds
 
-    DownloadInfo(){$This.Init($false,$null,$null,$null,$null,$null,$null,$null,$null,$null)}
-    DownloadInfo([Bool]$Success){$This.Init($Success,$null,$null,$null,$null,$null,$null,$null,$null,$null)}
-    DownloadInfo([Bool]$Success,[String]$Source){$This.Init($Success,$Source,$null,$null,$null,$null,$null,$null,$null,$null)}
-    DownloadInfo([Bool]$Success,[String]$Source,[System.IO.FileInfo]$Result,[UInt64]$Seconds){$This.Init($Success,$Source,$null,$null,$null,$null,$null,$null,$Result,$Seconds)}
-    DownloadInfo([Bool]$Success,[String]$Source,[Exception]$Exception){$This.Init($Success,$Source,$null,$null,$null,$null,$Exception,$Null,$null,$null)}
-    DownloadInfo([Bool]$Success,[String]$Source,[string[]]$Flags,[String]$Name,[String]$Extension,[String]$Destination,[Exception]$Exception,[String]$Message,[System.IO.FileInfo]$Result,[UInt64]$Seconds){
-        $This.Init($Success,$Source,$Flags,$Name,$Extension,$Destination,$Exception,$Message,$Result,$Seconds)
+
+    #Empty Constructor
+    DownloadInfo(){
+        $This.Init(
+            $false, #Success
+            $null,  #Source
+            $null,  #Flags
+            $null,  #Name
+            $null,  #Extension
+            $null,  #Destination
+            $null,  #Exception
+            $null,  #Message
+            $null,  #Result
+            $null   #Seconds
+        )
     }
 
-    hidden Init([Bool]$Success,[String]$Source,[String[]]$Flags,[String]$Name,[String]$Extension,[String]$Destination,[Exception]$Exception,[String]$Message,[System.IO.FileInfo]$Result,[UInt64]$Seconds){
-        $This.Success = $Success
-        $This.Source = $Source
-        $This.Flags = $Flags
-        $This.Name = $Name
-        $This.Extension = $Extension
-        $This.Destination = $Destination
-        $This.Exception = $Exception
-        $This.Message = $Message
-        $This.Result = $Result
-        $This.Seconds = $Seconds
+    #Only Success
+    DownloadInfo(
+        [Bool]$Success
+    ){
+        $This.Init(
+            $Success, #Success
+            $null,  #Source
+            $null,  #Flags
+            $null,  #Name
+            $null,  #Extension
+            $null,  #Destination
+            $null,  #Exception
+            $null,  #Message
+            $null,  #Result
+            $null   #Seconds
+        )
+    }
+
+    #Success + Source
+    DownloadInfo(
+        [Bool]$Success,
+        [String]$Source
+    ){
+        $This.Init(
+            $Success,   #Success
+            $Source,    #Source
+            $null,      #Flags
+            $null,      #Name
+            $null,      #Extension
+            $null,      #Destination
+            $null,      #Exception
+            $null,      #Message
+            $null,      #Result
+            $null       #Seconds
+        )
+    }
+
+    #Success + Source + Result + Seconds
+    DownloadInfo(
+        [Bool]$Success,
+        [String]$Source,
+        [System.IO.FileInfo]$Result,
+        [UInt64]$Seconds
+    ){
+        $This.Init(
+            $Success,   #Success
+            $Source,    #Source
+            $null,      #Flags
+            $null,      #Name
+            $null,      #Extension
+            $null,      #Destination
+            $null,      #Exception
+            $null,      #Message
+            $Result,    #Result
+            $Seconds    #Seconds
+        )
+    }
+
+    #Success + Source + Exception
+    DownloadInfo(
+        [Bool]$Success,
+        [String]$Source,
+        [Exception]$Exception
+    ){
+        $This.Init(
+            $Success,   #Success
+            $Source,    #Source
+            $null,      #Flags
+            $null,      #Name
+            $null,      #Extension
+            $null,      #Destination
+            $Exception, #Exception
+            $null,      #Message
+            $null,      #Result
+            $null       #Seconds
+        )
+    }
+
+    #Full Constructor
+    DownloadInfo(
+        [Bool]$Success,
+        [String]$Source,
+        [String[]]$Flags,
+        [String]$Name,
+        [String]$Extension,
+        [String]$Destination,
+        [Exception]$Exception,
+        [String]$Message,
+        [System.IO.FileInfo]$Result,
+        [UInt64]$Seconds
+    ){
+        $This.Init(
+            $Success,       #Success
+            $Source,        #Source
+            $Flags,         #Flags
+            $Name,          #Name
+            $Extension,     #Extension
+            $Destination,   #Destination
+            $Exception,     #Exception
+            $Message,       #Message
+            $Result,        #Result
+            $Seconds        #Seconds
+        )
+    }
+
+    hidden Init(
+            [Bool]$Success,
+            [String]$Source,
+            [String[]]$Flags,
+            [String]$Name,
+            [String]$Extension,
+            [String]$Destination,
+            [Exception]$Exception,
+            [String]$Message,
+            [System.IO.FileInfo]$Result,
+            [UInt64]$Seconds
+        ){
+            $This.Success = $Success
+            $This.Source = $Source
+            $This.Flags = $Flags
+            $This.Name = $Name
+            $This.Extension = $Extension
+            $This.Destination = $Destination
+            $This.Exception = $Exception
+            $This.Message = $Message
+            $This.Result = $Result
+            $This.Seconds = $Seconds
     }
 }
