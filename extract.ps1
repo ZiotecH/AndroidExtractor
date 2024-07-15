@@ -158,7 +158,7 @@ function ParseGitHubLink{
         [string]$URL
     )
     $local:ProgressPreference = "SilentlyContinue"
-    Return = (((Invoke-WebRequest $URL -UseBasicParsing).Content | ConvertFrom-Json).Assets | Where-Object{$_.Name -match "x64.msi"}).browser_download_url
+    Return (((Invoke-WebRequest $URL -UseBasicParsing).Content | ConvertFrom-Json).Assets | Where-Object{$_.Name -match "x64.msi"}).browser_download_url
 }
 Set-Alias "pghl" "ParseGitHubLink"
 
