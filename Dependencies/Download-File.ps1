@@ -16,13 +16,13 @@ function global:Download-File {
         #Setup Variables
         $myFlags = $PSCmdlet.MyInvocation.BoundParameters.Keys
         $FlagStatus = [PSCustomObject]@{
-            source = withFlag "source" $myFlags
-            name = withFlag "name" $myFlags
-            extension = withFlag "extension" $myFlags
-            destination = withFlag "destination" $myFlags
-            silent = withFlag "silent" $myFlags
-            subroutine = withFlag "subroutine" $myFlags
-            DownloadInfo = withFlag "DownloadInfo" $myFlags
+            source = (withFlag "source" $myFlags)
+            name = (withFlag "name" $myFlags)
+            extension = (withFlag "extension" $myFlags)
+            destination = (withFlag "destination" $myFlags)
+            silent = (withFlag "silent" $myFlags)
+            subroutine = (withFlag "subroutine" $myFlags)
+            DownloadInfo = (withFlag "DownloadInfo" $myFlags)
         }
         [string]$OriginalName = $source.split("/")[-1]
         [bool]$noName = $false

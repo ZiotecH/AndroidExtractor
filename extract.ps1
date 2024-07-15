@@ -58,6 +58,7 @@ $autoVars = [PSCustomObject]@{
 $DependencyStatus = @{
     "DownloadInfo" = $null
     "timeObject" = $null
+    "myMath" = $null
     "withFlag" = $null
     "Download-File" = $null
     "New-Arraylist" = $null
@@ -126,6 +127,7 @@ function DependencyCheck-Wrapper {
         if($Name -eq "Classes"){
             $DependencyStatus["DownloadInfo"] = DependencyCheck "DownloadInfo" 2
             $DependencyStatus["timeObject"] = DependencyCheck "DownloadInfo" 2
+            $DependencyStatus["myMath"] = DependencyCheck "myMath" 2
         }
         else{$DependencyStatus["$Name"] = DependencyCheck $Name 0}
     }
@@ -282,7 +284,7 @@ if(!(Get-Variable "myMods" -ErrorAction SilentlyContinue)){
                 }
                 . $myMods\New-ArrayList.ps1
             }
-            if(!$DependencyStatus["withFlag"] -or !(tfp "withFlag" "list")){
+            if (!$DependencyStatus["withFlag"] -or !(tfp "withFlag" "list")){
                 if (!(Test-Path $myMods\withFlag.ps1)) {
                     Invoke-WebRequest $depURLs.wif -OutFile "$($autoVars.depFolder)\withFlag.ps1" -ErrorAction Stop
                 }
@@ -322,6 +324,7 @@ if(!(Get-Variable "myMods" -ErrorAction SilentlyContinue)){
             $_
             Write-Host "`nDependency that failed:`n" -ForegroundColor DarkYellow
             $File | Format-List
+            ((Get-Date),"Failed to download one or more dependencies.","`nException: `n",($_ | Select *),"`nDependency that failed:`n", ($File | Format-List).ToString()) | Out-File .\Errors.txt -Encoding utf8 -Append
             Return $false; Break;
         }
         $ProgressPreference = $pp
