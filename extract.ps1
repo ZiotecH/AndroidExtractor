@@ -156,7 +156,7 @@ function ParseGitHubLink{
         [string]$URL
     )
     $local:ProgressPreference = "SilentlyContinue"
-    $depURLs.zip = (((Invoke-WebRequest $depURLs.zip -UseBasicParsing).Content | ConvertFrom-Json).Assets | Where-Object{$_.Name -match "x64.msi"}).browser_download_url
+    Return = (((Invoke-WebRequest $URL -UseBasicParsing).Content | ConvertFrom-Json).Assets | Where-Object{$_.Name -match "x64.msi"}).browser_download_url
 }
 Set-Alias "pghl" "ParseGitHubLink"
 
@@ -172,8 +172,7 @@ function DownloadApplication{
     }
     switch($Application){
         0 {
-            $depURLs.zip = pghl $depURLs.zip
-            $File = (Download-File -Source $depURLs.zip -silent)
+            $File = (Download-File -Source (pghl $depURLs.zip) -silent)
             $Result.File = $File
             if($File.Success){
                 $InstallResult = (Start-Process msiexec -ArgumentList ("-a","$($File.Result)","-l","7zip-x64.log","TARGETDIR=`"$($autoVars.depFolder)\7zip`"","-passive"));
