@@ -33,20 +33,21 @@ class FlagInfo {
     }
 }
 
-$Dependencies = ("Classes.ps1","New-ArrayList.ps1", "isNull.ps1", "Write-ProgressBar.ps1", "Get-Time.ps1", "Download-File.ps1", "withFlag.ps1");
+$Dependencies = ("Classes.ps1","New-ArrayList.ps1", "isNull.ps1", "Write-ProgressBar.ps1", "Get-Time.ps1", "Download-File.ps1", "withFlag.ps1", "hmsCalc.ps1");
 $Applications = @{ "adb" = "https://developer.android.com/tools/releases/platform-tools#downloads"; "7zip" = "https://www.7-zip.org/download.html" }
 $HalfWidth = [Math]::Floor(($Host.UI.RawUI.WindowSize.Width-1)/2);
-$dlURL = $null;
+$dlURL = "https://raw.githubusercontent.com/ZiotecH/AndroidExtractor/dev/Dependencies";
 $depURLs = [PSCustomObject]@{
-    cls = $null
+    cls = "$dlURL/Classes.ps1"
     adb = "https://dl.google.com/android/repository/platform-tools-latest-windows.zip"
-    nal = $null
-    isn = $null
-    dlf = $null
-    wif = $null
-    wpb = $null
-    get = $null
-    zip = "https://fetafisken.se/7za.exe"
+    nal = "$dlURL/New-ArrayList.ps1"
+    isn = "$dlURL/isNull.ps1"
+    dlf = "$dlURL/Download-File.ps1"
+    wif = "$dlURL/withFlag.ps1"
+    wpb = "$dlURL/Write-ProgressBar.ps1"
+    get = "$dlURL/Get-Time.ps1"
+    hms = "$dlURL/hmscalc.ps1"
+    zip = "https://api.github.com/repos/ip7z/7zip/releases/latest"
 }
 $autoVars = [PSCustomObject]@{
     depFolder = "Dependencies"
@@ -63,6 +64,7 @@ $DependencyStatus = @{
     "Write-ProgressBar" = $null
     "Get-Time" = $null
     "adb" = $null
+    "hms" = $null
     "7zip" = $null
 }
 $autoVars.depExist = (Test-Path ".\$($autoVars.depFolder)")
@@ -76,6 +78,7 @@ function DependencyCheck{
     
     )
     process {
+        $local:ErrorActionPreference = 'SilentlyContinue'
         $Result = $false
         switch($Type){
             0 {
@@ -145,6 +148,60 @@ function Write-Highlight($a,$b,$c,$x="DarkCyan",$y="Yellow"){
 }
 function Write-Div($width = ($HOST.UI.RawUI.WindowSize.Width-1) ) { Return (Write-Host "$("#"*$width)" -ForegroundColor DarkGray) }
 Set-Alias -Name wd -Value Write-Div -Scope Local
+
+function ParseGitHubLink{
+    param(
+        [string]$URL
+    )
+    $local:ProgressPreference = "SilentlyContinue"
+    $depURLs.zip = (((Invoke-WebRequest $depURLs.zip -UseBasicParsing).Content | ConvertFrom-Json).Assets | Where-Object{$_.Name -match "x64.msi"}).browser_download_url
+}
+Set-Alias "pghl" "ParseGitHubLink"
+
+function DownloadApplication{
+    param(
+        [int]$Application
+    )
+    $File = [DownloadInfo]::New();
+    $Result = [PSCUstomObject]@{
+        File = $null
+        Installed = $false
+        Location = $null
+    }
+    switch($Application){
+        0 {
+            $File = (Download-File -Source $depURLs.zip -quiet)
+            $Result.File = $File
+            if($File.Success){
+                $InstallResult = (Start-Process msiexec -ArgumentList ("-a","$($File.Result)","-l","7zip-x64.log","TARGETDIR=`"$($autoVars.depFolder)\7zip`"","-passive"));
+                if($InstallResult.ExitCode -ne 0){Write-Fail "Failed to install 7zip, please check '7zip-x64.log' for more details."}else{
+                    $Result.Installed = $true
+                    $Result.Location = (Get-Item "$($autoVars.depFolder)\7zip")
+                    $DependencyStatus["7zip"] = $true
+                    Remove-Item "$($Result.Location)\install.msi"
+                    Copy-Item "$($Result.Location)\Files\7-zip\*" -Destination "$(Result.Location)\" -Recurse
+                    Remove-Item "$(Result.Location)\Files" -Recurse -Force
+                    Remove-Item $File.Result -Recurse -Force
+                }
+            }
+            Break;
+        }
+        1 {
+            $File = (Download-File -Source $depURLs.adb -quiet)
+            $Result.File = $File
+            if(!$DependencyStatus["7zip"]){Return $Result}
+            if($File.Success){
+                7z x $File.Result;
+                $Result.Installed = $true
+                $Result.Location = (Get-Item ".\platform-tools")
+                $DependencyStatus["adb"] = $true
+            }
+            Break;
+        }
+        Default {$File.Success = $False; Break;}
+    }
+    Return $Result
+}
 
 if($Help){
     write-host $null
@@ -235,12 +292,13 @@ if(!(Get-Variable "myMods" -ErrorAction SilentlyContinue)){
         try{
             Push-Location
             Set-Location $autoVars.depFolder
-            if(!$DependencyStatus["7zip"])  {$File = Download-File -source $depURLs.zip -silent; Set-Alias "7z" $file.Result; }
-            if(!$DependencyStatus["adb"])   {$File = Download-File $depURLs.adb -silent; 7z x $file.Result; Set-Alias "adb" (Get-Item ".\platform-tools\adb.exe"); }
+            if(!$DependencyStatus["7zip"])  {$File = (DownloadApplication 0); if($File.Installed){Set-Alias "7z" (Get-Item "$($File.Location)\7z.exe")}; }
+            if(!$DependencyStatus["adb"])   {$File = (DownloadApplication 1); if($File.Installed){Set-Alias "adb" (Get-Item "$($File.Location)\adb.exe")}; }
             if(!$DependencyStatus["isn"])   {$File = Download-File -source $depURLs.isn -silent; . $File.Result; }
             if(!$DependencyStatus["nal"])   {$File = Download-File -source $depURLs.nal -silent; . $File.Result; }
             if(!$DependencyStatus["wpb"])   {$File = Download-File -source $depURLs.wpb -silent; . $File.Result; }
             if(!$DependencyStatus["get"])   {$File = Download-File -source $depURLs.get -silent; . $File.Result; }
+            if(!$DependencyStatus["hms"])   {$File = Download-File -source $depURLs.hms -silent; . $File.Result; }
             DependencyCheck-Wrapper
             Pop-Location
         }
@@ -250,6 +308,7 @@ if(!(Get-Variable "myMods" -ErrorAction SilentlyContinue)){
             $_
             Write-Host "`nDependency that failed:`n" -ForegroundColor DarkYellow
             $File | Format-List
+            Return $false; Break;
         }
         $ProgressPreference = $pp
         $ErrorActionPreference = $ea
@@ -258,16 +317,18 @@ if(!(Get-Variable "myMods" -ErrorAction SilentlyContinue)){
     if($null -eq $myMods){Write-Fail "Failed to find depedency folder.`nPlease make sure you have all dependencies.";Return $false;break;}
 }
 
-if(!(Get-Alias "adb" -ErrorAction SilentlyContinue)){
-    Write-Fail "Failed to find adb.exe, please make sure you have it installed.";
-    Write-Highlight "You can download it at " $Applications["adb"] ".";
+if($Auto){$File = (DownloadApplication 0);if($File.Installed){Set-Alias "7z" (Get-Item "$($File.Location)\7z.exe")}}
+if (!$DependencyStatus["7zip"]) {
+    Write-Fail "Failed to find 7z.exe, please make sure you have it installed.";
+    Write-Highlight "You can download it at " $Applications["7zip"] ".";
     Return $false
     break;
 }
 
-if (!(Get-Alias "7z" -ErrorAction SilentlyContinue)) {
-    Write-Fail "Failed to find 7z.exe, please make sure you have it installed.";
-    Write-Highlight "You can download it at " $Applications["7zip"] ".";
+if($Auto){$File = (DownloadApplication 1);if($File.Installed){Set-Alias "adb" (Get-Item "$($File.Location)\adb.exe")}}
+if(!$DependencyStatus["adb"]) {
+    Write-Fail "Failed to find adb.exe, please make sure you have it installed.";
+    Write-Highlight "You can download it at " $Applications["adb"] ".";
     Return $false
     break;
 }
@@ -318,8 +379,8 @@ if($null -ne $listFile){
         if($grabList.count -ge 1){Write-Host "Enter nothing to proceed with extraction." -ForegroundColor Yellow}
         $input = Read-Host
         
-        if((isNull $input)){$isNull = $true}
-        else{ $grabList.add($input)>$null }
+        $isNull = isNull $input
+        if(!$isNull){$grabList.add($input)>$null}
         Clear-Host
     }
 }
@@ -333,6 +394,7 @@ Set-Location ".\$($target)\"
 
 Write-Host "Extracting $($grabList.count) objects to $($target)." -ForegroundColor Yellow
 $i=0
+$ExtractionStart = (Get-Date);
 foreach($folder in $grabList){
     $i++
     $list = New-ArrayList
@@ -341,9 +403,11 @@ foreach($folder in $grabList){
     #$list.add(">")
     #$list.add("$($folder).tar.gz")
     #Write-Host "Extracting $folder from /storage/emulated/0/"
-    wpb -msg "$folder [$($i)/$($grabList.Count)]" -cur $i -tot $grablist.count
+    wpb -msg "$folder [$($i)/$($grabList.Count)]" -cur $i -tot $grablist.Count
     adb $list > "$($folder).tar.gz"
 }
+$ExtractionComplete = (Get-Date);
 wpb -msg "Complete" -cur $i -tot $grablist.count -final
+Write-Highlight -a "Extracting " -b ($grabList.Count) -c " took $(hmsCalc (($ExtractionComplete - $ExtractionStart).TotalSeconds) 0)."
 Pop-Location
 Return $true
