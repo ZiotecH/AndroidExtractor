@@ -1,5 +1,5 @@
 #Stolen from web :D
-function DisplayInBytes($num) {
+function global:DisplayInBytes($num) {
     $suffix = "B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"
     $index = 0
     while ($num -gt 1kb) {

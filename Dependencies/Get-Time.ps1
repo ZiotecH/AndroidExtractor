@@ -1,4 +1,4 @@
-function Get-Time {
+function global:Get-Time {
     param(
         [switch][Alias("dt")][parameter(Mandatory = $false)]$dateTime,
         [switch][Alias("t")][parameter(Mandatory = $false)]$Table,
@@ -105,6 +105,6 @@ function Get-Time {
     }
 }
 
-Set-Alias 'time' 'Get-Time'
-Set-Alias 'clock' 'Get-Time'
-Set-Alias 'now' 'Get-Time'
+Set-Alias 'time' 'Get-Time' -Scope Global
+Set-Alias 'clock' 'Get-Time' -Scope Global
+Set-Alias 'now' 'Get-Time' -Scope Global

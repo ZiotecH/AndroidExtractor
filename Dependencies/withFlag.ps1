@@ -1,5 +1,5 @@
 #withFlag ([String]FLAG)
-function withFlag{
+function global:withFlag {
     param(
         [Parameter(Mandatory=$false)]$string,
         [Parameter(Mandatory=$false)]$flagArray,

@@ -1,4 +1,4 @@
-function Write-ProgressBar {
+function global:Write-ProgressBar {
     param(
         [string][parameter(Mandatory = $false)]$msgPayload,
         [double][parameter(Mandatory = $false)]$progress = 0.00,

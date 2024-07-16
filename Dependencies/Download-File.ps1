@@ -37,7 +37,7 @@ function global:Download-File {
         if (!$FlagStatus.source){
             if(!$FlagStatus.DownloadInfo){
                 $DownloadInfo.Flags = $myFlags
-                $DownloadInfo.Exception = [Exception]::New("No download source was defined.")
+                $DownloadInfo.ErrorRecord = [System.Management.Automation.ErrorRecord]::New("No download source was defined.")
                 $DownloadInfo.Message = "No download source was defined."
                 return $DownloadInfo
             }
@@ -77,8 +77,8 @@ function global:Download-File {
             $response = $request.GetResponse()
             $ErrorActionPreference = $ea
         }
-        catch [System.Net.WebException] {
-            if($_.Exception.InnerException.Status -eq "Timeout"){
+        catch [System.Net.WebErrorRecord] {
+            if($_.ErrorRecord.InnerErrorRecord.Status -eq "Timeout"){
                 $errMsg = "Error: Operation timed out."
                 if(!$silent){
                     Write-Host "$errMsg" -ForegroundColor Red
@@ -86,7 +86,7 @@ function global:Download-File {
                 }
                 $DownloadInfo.Success = $false
                 $DownloadInfo.Flags = $myFlags
-                $DownloadInfo.Exception = $_
+                $DownloadInfo.ErrorRecord = $_
                 $DownloadInfo.Message = $errMsg
                 return $DownloadInfo
             }
@@ -94,7 +94,7 @@ function global:Download-File {
         catch{
             $DownloadInfo.Success = $false
             $DownloadInfo.Flags = $myFlags
-            $DownloadInfo.Exception = $_
+            $DownloadInfo.ErrorRecord = $_
             $DownloadInfo.Message = $errMsg
             Return $DownloadInfo
         }
@@ -187,16 +187,16 @@ function global:Download-File {
         catch {
             $DownloadInfo.Success = $false
             $DownloadInfo.Flags = $myFlags
-            $DownloadInfo.Exception = $_
-            $DownloadInfo.Message = "Generic error, check attached exception."
+            $DownloadInfo.ErrorRecord = $_
+            $DownloadInfo.Message = "Generic error, check attached ErrorRecord."
         }
         finally {
             $responseStream.Dispose()
         }
-        if(!$DownloadInfo.Success -and (Test-Path $combined_name)){rm $combined_name;}
+        if(!$DownloadInfo.Success -and (Test-Path $combined_name)){Remove-Item $combined_name;}
         return $DownloadInfo
 
     }
 }
 
-Set-Alias 'dl' 'Download-File'
+Set-Alias 'dl' 'Download-File' -Scope Global

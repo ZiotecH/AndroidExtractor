@@ -233,7 +233,7 @@ class DownloadInfo {
     [String]$Name
     [String]$Extension
     [String]$Destination
-    [Exception]$Exception
+    [System.Management.Automation.ErrorRecord]$ErrorRecord
     [String]$Message
     [System.IO.FileInfo]$Result
     [UInt64]$Seconds
@@ -248,7 +248,7 @@ class DownloadInfo {
             $null,  #Name
             $null,  #Extension
             $null,  #Destination
-            $null,  #Exception
+            $null,  #ErrorRecord
             $null,  #Message
             $null,  #Result
             $null   #Seconds
@@ -266,7 +266,7 @@ class DownloadInfo {
             $null,  #Name
             $null,  #Extension
             $null,  #Destination
-            $null,  #Exception
+            $null,  #ErrorRecord
             $null,  #Message
             $null,  #Result
             $null   #Seconds
@@ -285,7 +285,7 @@ class DownloadInfo {
             $null,      #Name
             $null,      #Extension
             $null,      #Destination
-            $null,      #Exception
+            $null,      #ErrorRecord
             $null,      #Message
             $null,      #Result
             $null       #Seconds
@@ -306,30 +306,30 @@ class DownloadInfo {
             $null,      #Name
             $null,      #Extension
             $null,      #Destination
-            $null,      #Exception
+            $null,      #ErrorRecord
             $null,      #Message
             $Result,    #Result
             $Seconds    #Seconds
         )
     }
 
-    #Success + Source + Exception
+    #Success + Source + ErrorRecord
     DownloadInfo(
         [Bool]$Success,
         [String]$Source,
-        [Exception]$Exception
+        [System.Management.Automation.ErrorRecord]$ErrorRecord
     ){
         $This.Init(
-            $Success,   #Success
-            $Source,    #Source
-            $null,      #Flags
-            $null,      #Name
-            $null,      #Extension
-            $null,      #Destination
-            $Exception, #Exception
-            $null,      #Message
-            $null,      #Result
-            $null       #Seconds
+            $Success,       #Success
+            $Source,        #Source
+            $null,          #Flags
+            $null,          #Name
+            $null,          #Extension
+            $null,          #Destination
+            $ErrorRecord,   #ErrorRecord
+            $null,          #Message
+            $null,          #Result
+            $null           #Seconds
         )
     }
 
@@ -341,7 +341,7 @@ class DownloadInfo {
         [String]$Name,
         [String]$Extension,
         [String]$Destination,
-        [Exception]$Exception,
+        [System.Management.Automation.ErrorRecord]$ErrorRecord,
         [String]$Message,
         [System.IO.FileInfo]$Result,
         [UInt64]$Seconds
@@ -353,7 +353,7 @@ class DownloadInfo {
             $Name,          #Name
             $Extension,     #Extension
             $Destination,   #Destination
-            $Exception,     #Exception
+            $ErrorRecord,     #ErrorRecord
             $Message,       #Message
             $Result,        #Result
             $Seconds        #Seconds
@@ -367,7 +367,7 @@ class DownloadInfo {
             [String]$Name,
             [String]$Extension,
             [String]$Destination,
-            [Exception]$Exception,
+            [System.Management.Automation.ErrorRecord]$ErrorRecord,
             [String]$Message,
             [System.IO.FileInfo]$Result,
             [UInt64]$Seconds
@@ -378,7 +378,7 @@ class DownloadInfo {
             $This.Name = $Name
             $This.Extension = $Extension
             $This.Destination = $Destination
-            $This.Exception = $Exception
+            $This.ErrorRecord = $ErrorRecord
             $This.Message = $Message
             $This.Result = $Result
             $This.Seconds = $Seconds

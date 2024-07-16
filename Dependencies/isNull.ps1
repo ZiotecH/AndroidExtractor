@@ -1,5 +1,5 @@
 #isNull check
-function isNullOrEmpty {
+function global:isNullOrEmpty {
     param(
         [parameter(Mandatory = $false,ValueFromPipeline = $true)]$data
     )
@@ -12,4 +12,4 @@ function isNullOrEmpty {
     }
 }
 
-Set-Alias "isNull" isNullOrEmpty
+Set-Alias "isNull" isNullOrEmpty -Scope Global

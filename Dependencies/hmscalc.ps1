@@ -1,6 +1,6 @@
 ﻿#hms calc
 
-function HourMinuteSecond-Calculator {
+function global:HourMinuteSecond-Calculator {
     param(
         [int64][parameter(Mandatory=$true,ValueFromPipeline=$true)]$query,
         [int32][parameter(Mandatory=$false)]$returnMethod
